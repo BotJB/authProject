@@ -3,6 +3,7 @@ const router=express.Router();
 const userModel=require('../models/authModel')
 const Joi=require('@hapi/joi')
 const bcrypt=require('bcryptjs')
+const jwt=require('jsonwebtoken')
 const {validation,loginValidation}=require('./validation')
 
 //Post route for the process
@@ -56,6 +57,9 @@ router.post('/login',async(req,res)=>{
         res.status(400).send('invalid password')
         return
     }
+    const token=jwt.sign({id:user._id},'shhhhhhhhhh')
+    
+    res.header('auth-token',token).send(token)
     
 
 })
