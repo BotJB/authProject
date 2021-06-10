@@ -3,7 +3,7 @@ const router=express.Router();
 const userModel=require('../models/authModel')
 const Joi=require('@hapi/joi')
 const bcrypt=require('bcryptjs')
-const {validation}=require('./validation')
+const {validation,loginValidation}=require('./validation')
 
 //Post route for the process
 router.post('/resgistration',async(req,res)=>{
@@ -37,6 +37,26 @@ const hashedPass=await bcrypt.hash(req.body.password,salt);
     catch(err){
         console.log(err)
     }
+
+})
+//Post routes
+router.post('/login',async(req,res)=>{
+    const {error}=loginValidation(req.body);
+    if(error){
+        res.send(error.details[0].message)
+        return;
+    }
+    const user=await userModel.findOne({email:req.body.email})
+    if(!user){
+        res.status(400).send('invalid email or password')
+        return
+    }
+    const validPass=await bcrypt.compare(req.body.password,user.password)
+    if(!validPass){
+        res.status(400).send('invalid password')
+        return
+    }
+    
 
 })
 module.exports=router;
